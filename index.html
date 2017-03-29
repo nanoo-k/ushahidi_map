@@ -63,6 +63,9 @@
 
     <script src="./Distribution_of_Donor_and_GOK_Funded_Projects_2013_to_2015.js"></script>
     <script src="./us-states.js"></script>
+    <script src="./kenya-county-data.js"></script>
+
+
     <script>
         L.mapbox.accessToken = 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw';
         var map = L.mapbox.map('map', 'mapbox.streets')
@@ -132,7 +135,7 @@
         var popup = new L.Popup({ autoPan: false });
 
         // statesData comes from the 'us-states.js' script included above
-        var statesLayer = L.geoJson(statesData,  {
+        var statesLayer = L.geoJson(kenya_counties,  {
             style: getStyle,
             onEachFeature: onEachFeature
         }).addTo(map);
@@ -145,7 +148,7 @@
                 opacity: 0.1,
                 color: 'black',
                 fillOpacity: 0.7,
-                fillColor: getColor(feature.properties.density)
+                fillColor: getColor(feature.properties.diss_me)
             };
         }
 
@@ -179,7 +182,7 @@
             // Set position and content of the popup
             popup.setLatLng(e.latlng);
             popup.setContent('<div class="marker-title">' + layer.feature.properties.name + '</div>' +
-                layer.feature.properties.density + ' people per square mile');
+                layer.feature.properties.diss_me + ' is diss_me number');
 
             // Open the popup
             if (!popup._map) popup.openOn(map);
@@ -223,8 +226,8 @@
             from, to;
 
             for (var i = 0; i < grades.length; i++) {
-            from = grades[i];
-            to = grades[i + 1];
+                from = grades[i];
+                to = grades[i + 1];
 
                 // A label defines what one of the colors means in terms of population density
                 labels.push(
