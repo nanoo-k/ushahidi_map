@@ -1,0 +1,19 @@
+{
+  "name": "ushahidi_map",
+  "version": "1.0.0",
+  "description": "Mapping data using mapbox.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nanoo-k/ushahidi_map.git"
+  },
+  "author": "Miguel S. Valencia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nanoo-k/ushahidi_map/issues"
+  },
+  "homepage": "https://github.com/nanoo-k/ushahidi_map#readme"
+}
