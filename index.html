@@ -1,19 +1,98 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <script src='https://api.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.js'></script>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.css' rel='stylesheet' />
+    <!--<script src='https://api.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.css' rel='stylesheet' />-->
+
+    <meta charset=utf-8 />
+    <title>Listing markers in clusters</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.css' rel='stylesheet' />
+
+    <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
 </head>
 
 <body>
 
-    <div id='map' style='width: 400px; height: 300px;'></div>
+    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css' rel='stylesheet' />
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css' rel='stylesheet' />
+
+    <style>
+        pre.ui-coordinates {
+        background:rgba(0,0,0,0.5);
+        position:absolute;
+        bottom:10px;
+        left:10px;
+        padding:5px 10px;
+        color:#fff;
+        font-size:11px;
+        line-height:18px;
+        border-radius:3px;
+        max-height:240px;
+        overflow:auto;
+        width:100px;
+        }
+    </style>
+
+    <div id='map'></div>
+    <pre id='coordinates' class='ui-coordinates'></pre>
+
+    <script src="./sample-data.js"></script>
+    <script>
+        L.mapbox.accessToken = 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw';
+        var map = L.mapbox.map('map', 'mapbox.streets')
+            .setView([-37.82, 175.215], 14);;
+
+        var markers = new L.MarkerClusterGroup();
+
+        for (var i = 0; i < addressPoints.length; i++) {
+            var a = addressPoints[i];
+            var title = a[2];
+            var marker = L.marker(new L.LatLng(a[0], a[1]), {
+                icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
+                title: title
+            });
+            marker.bindPopup(title);
+            markers.addLayer(marker);
+        }
+
+        map.addLayer(markers);
+
+        function onmove() {
+            // Get the map bounds - the top-left and bottom-right locations.
+            var inBounds = [],
+                bounds = map.getBounds();
+            markers.eachLayer(function(marker) {
+                // For each marker, consider whether it is currently visible by comparing
+                // with the current map bounds.
+                if (bounds.contains(marker.getLatLng())) {
+                    inBounds.push(marker.options.title);
+                }
+            });
+            // Display a list of markers.
+            document.getElementById('coordinates').innerHTML = inBounds.join('\n');
+        }
+
+        map.on('move', onmove);
+
+        // call onmove off the bat so that the list is populated.
+        // otherwise, there will be no markers listed until the map is moved.
+        onmove();
+    </script>
+
+    <!--<div id='map' style='width: 400px; height: 300px;'></div>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw';
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/streets-v9'
         });
-    </script>
+    </script>-->
 
 </body>
 </html>
