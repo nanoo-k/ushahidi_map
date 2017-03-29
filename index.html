@@ -148,7 +148,7 @@
                 opacity: 0.1,
                 color: 'black',
                 fillOpacity: 0.7,
-                fillColor: getColor(feature.properties.diss_me)
+                fillColor: getColor(feature.properties.PERIMETER)
             };
         }
 
@@ -181,8 +181,8 @@
 
             // Set position and content of the popup
             popup.setLatLng(e.latlng);
-            popup.setContent('<div class="marker-title">' + layer.feature.properties.name + '</div>' +
-                layer.feature.properties.diss_me + ' is diss_me number');
+            popup.setContent('<div class="marker-title">' + layer.feature.properties.COUNTY + '</div>' +
+                layer.feature.properties.PERIMETER + ' is PERIMETER number');
 
             // Open the popup
             if (!popup._map) popup.openOn(map);
