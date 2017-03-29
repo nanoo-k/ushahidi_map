@@ -62,6 +62,26 @@
             markers.addLayer(marker);
         }
 
+        for (var i = 0; i < data.features.length; i++) {
+            // The specific data we're working with is 'a'
+            var a = data.features[i];
+            var props = a["properties"];
+
+            if (props["x"] != null) {
+                // Get title
+                var title = props["project_title"];
+                // Create marker
+                var marker = L.marker(new L.LatLng(props["x"],props["y"]), {
+                    icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
+                    title: title
+                });
+                // Slap marker onto map
+                marker.bindPopup(title);
+                markers.addLayer(marker);
+            }
+
+        }
+
         map.addLayer(markers);
 
         function onmove() {
