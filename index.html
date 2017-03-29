@@ -47,7 +47,7 @@
     <script>
         L.mapbox.accessToken = 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw';
         var map = L.mapbox.map('map', 'mapbox.streets')
-            .setView([-37.82, 175.215], 14);;
+            .setView([-0.143502, 38.031614], 6);
 
         var markers = new L.MarkerClusterGroup();
 
@@ -57,12 +57,16 @@
             var props = a["properties"];
 
             if (props["x"] != null) {
-                // Get title
+                // Get title, description and objectives
                 var title = props["project_title"];
+                var description = props["project_description"];
+                var objectives = props["project_objectives"];
+
                 // Create marker
                 var marker = L.marker(new L.LatLng(props["y"], props["x"]), {
                     icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
-                    title: title
+                    title: title,
+                    description: description
                 });
                 // Slap marker onto map
                 marker.bindPopup(title);
