@@ -60,6 +60,16 @@ map.on('move', onmove);
 onmove();
 
 
+var project_density = [];
+data.features.forEach(function(feature, i) {
+    var county = feature.properties.county;
+    if (project_density[county] == undefined) {
+        project_density[county] = 1;
+    } else {
+        project_density[county] = project_density[county] + 1;
+    }
+});
+
 
 //
 // CHOROPLETH
@@ -82,19 +92,22 @@ function getStyle(feature) {
         opacity: 0.1,
         color: 'black',
         fillOpacity: 0.7,
-        fillColor: getColor(feature.properties.PERIMETER)
+        fillColor: getColor(feature.properties.COUNTY)
     };
 }
 
 // get color depending on population density value
-function getColor(d) {
-    return d > 1000 ? '#8c2d04' :
-        d > 500  ? '#cc4c02' :
-        d > 200  ? '#ec7014' :
-        d > 100  ? '#fe9929' :
-        d > 50   ? '#fec44f' :
-        d > 20   ? '#fee391' :
-        d > 10   ? '#fff7bc' :
+function getColor(county) {
+
+    var COUNTY = project_density[county.toUpperCase()];
+
+    return COUNTY > 1000 ? '#8c2d04' :
+        COUNTY > 500  ? '#cc4c02' :
+        COUNTY > 200  ? '#ec7014' :
+        COUNTY > 100  ? '#fe9929' :
+        COUNTY > 50   ? '#fec44f' :
+        COUNTY > 20   ? '#fee391' :
+        COUNTY > 10   ? '#fff7bc' :
         '#ffffe5';
 }
 
