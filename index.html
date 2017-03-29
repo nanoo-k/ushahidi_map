@@ -42,7 +42,7 @@
     <div id='map'></div>
     <pre id='coordinates' class='ui-coordinates'></pre>
 
-    <script src="./sample-data.js"></script>
+    <!--<script src="./sample-data.js"></script>-->
     <script src="./Distribution_of_Donor_and_GOK_Funded_Projects_2013_to_2015.js"></script>
     <script>
         L.mapbox.accessToken = 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw';
@@ -50,17 +50,6 @@
             .setView([-37.82, 175.215], 14);;
 
         var markers = new L.MarkerClusterGroup();
-
-        for (var i = 0; i < addressPoints.length; i++) {
-            var a = addressPoints[i];
-            var title = a[2];
-            var marker = L.marker(new L.LatLng(a[0], a[1]), {
-                icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
-                title: title
-            });
-            marker.bindPopup(title);
-            markers.addLayer(marker);
-        }
 
         for (var i = 0; i < data.features.length; i++) {
             // The specific data we're working with is 'a'
