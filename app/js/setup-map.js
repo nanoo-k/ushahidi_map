@@ -1,3 +1,6 @@
+//
+// MARKERS
+////////////
 L.mapbox.accessToken = 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw';
 var map = L.mapbox.map('map', 'mapbox.streets')
     .setView([-0.143502, 38.031614], 6);
