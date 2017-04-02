@@ -29,6 +29,10 @@ var MyMap = {
     // Mapbox project cost per county layer
     projectCostPerCountyLayer: {},
 
+    // HTML for the various map legends
+    projectCostLegend: null,
+    projectCountLegend: null,
+
     // Layers data
     kenyaCounties: kenya_counties,
 
@@ -52,31 +56,10 @@ var MyMap = {
         this.createChoropleth();
 
         // Create the legend
-        this.createLegend();
+        this.createLegends();
 
         // Set up the radio button blick handler
         this.setupRadioButtonClickHandler();
-    },
-
-
-    setupRadioButtonClickHandler () {
-        MyMap.radioBtns.forEach( function (btn, i) {
-            btn.onclick = function(e) {
-                // Shut off project COST per county layer
-                // Turn on project COUNT per county layer
-                if (e.target.value === "project_cost") {
-                    MyMap.map.removeLayer(MyMap.projectCostPerCountyLayer);
-                    MyMap.map.addLayer(MyMap.projectCountPerCountyLayer);
-                }
-                // Else user clicked the `project_count`
-                // Shut off project COUNT per county layer
-                // Turn on project COST per county layer
-                else {
-                    MyMap.map.removeLayer(MyMap.projectCountPerCountyLayer);
-                    MyMap.map.addLayer(MyMap.projectCostPerCountyLayer);
-                }
-            }
-        });
     },
 
 
@@ -400,9 +383,13 @@ var MyMap = {
 
 
     /**
-     * Define features in the legend
+     * Define features in the legend for project count
      */
-    getLegendHTML() {
+    getProjectCountLegendHTML() {
+
+        // If this legend already exists, use it. Else build it and use it.
+        if (MyMap.projectCountLegend != null) return MyMap.projectCountLegend;
+
         // "Grades" display the population density for each label
         var grades = [null, 0, 5, 10, 20, 50, 100, 200, 500],
         labels = [],
@@ -430,16 +417,96 @@ var MyMap = {
 
         }
 
+        MyMap.projectCountLegend = '<span>Projects per county</span><ul>' + labels.join('') + '</ul>';
+
         // Return the HTML for the legend
-        return '<span>People per square mile</span><ul>' + labels.join('') + '</ul>';
+        return MyMap.projectCountLegend;
     },
 
 
     /**
-     * Create the map legend
+     * Define features in the legend for project cost
      */
-    createLegend() {
-        MyMap.map.legendControl.addLegend(MyMap.getLegendHTML());
+    getProjectCostLegendHTML() {
+
+        // If this legend already exists, use it. Else build it and use it.
+        if (MyMap.projectCostLegend != null) return MyMap.projectCostLegend;
+
+        // "Grades" display the population density for each label
+        var grades = [null, 0, 100000000, 1000000000, 10000000000, 50000000000, 100000000000, 500000000000, 1000000000000],
+        labels = [],
+        from, to;
+
+        for (var i = 0; i < grades.length; i++) {
+            from = grades[i];
+            to = grades[i + 1];
+
+            // A label defines what one of the colors means in terms of population density
+            // Create label for undefined data (grey)
+            if (grades[i] == undefined) {
+                var color = MyMap.getCostPerCountyColor(null);
+                var text = "No data available";
+            }
+            // Create labels for every other color
+            else {
+                var color = MyMap.getCostPerCountyColor(from + 1);
+                var text = from + (to ? '&ndash;' + to : '+');
+            }
+
+            labels.push(
+                '<li><span class="swatch" style="background:' + color + '"></span> ' +
+                text);
+
+        }
+
+        MyMap.projectCostLegend = '<span>Average project costper county</span><ul>' + labels.join('') + '</ul>';
+
+        // Return the HTML for the legend
+        return MyMap.projectCostLegend;
+    },
+
+
+    /**
+     * Create the map legends
+     */
+    createLegends() {
+        MyMap.map.legendControl.addLegend(MyMap.getProjectCountLegendHTML());
+    },
+
+
+    /**
+     * Set up the click handler for the radio btns.
+     * This switches between showing the average project cost per county
+     * and the project count per county.
+     */
+    setupRadioButtonClickHandler () {
+        MyMap.radioBtns.forEach( function (btn, i) {
+            btn.onclick = function(e) {
+                // Shut off project COST per county layer
+                // Turn on project COUNT per county layer
+                if (e.target.value === "project_cost") {
+                    // Remove layer and legend
+                    MyMap.map.removeLayer(MyMap.projectCostPerCountyLayer);
+                    MyMap.map.legendControl.removeLegend(MyMap.getProjectCostLegendHTML());
+
+                    // Add layer and legend
+                    MyMap.map.addLayer(MyMap.projectCountPerCountyLayer);
+                    MyMap.map.legendControl.addLegend(MyMap.getProjectCountLegendHTML());
+                }
+                // Else user clicked the `project_count`
+                // Shut off project COUNT per county layer
+                // Turn on project COST per county layer
+                else {
+                    // Remove layer and legend
+                    MyMap.map.removeLayer(MyMap.projectCountPerCountyLayer);
+                    MyMap.map.legendControl.removeLegend(MyMap.getProjectCountLegendHTML());
+
+                    // Add layer and legend
+                    MyMap.map.addLayer(MyMap.projectCostPerCountyLayer);
+                    MyMap.map.legendControl.addLegend(MyMap.getProjectCostLegendHTML());
+                }
+            }
+        });
     }
 
 };
