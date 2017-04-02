@@ -349,8 +349,6 @@ var MyMap = {
     // Set event callbacks
     onEachFeatureForCount(feature, layer, zoomType) {
         layer.on({
-            mousemove: MyMap.mouseMove,
-            mouseout: MyMap.mouseOut,
             click: MyMap.zoomToCountyForCount
         });
     },
@@ -359,30 +357,8 @@ var MyMap = {
     // Set event callbacks
     onEachFeatureForCost(feature, layer, zoomType) {
         layer.on({
-            mousemove: MyMap.mouseMove,
-            mouseout: MyMap.mouseOut,
             click: MyMap.zoomToCountyForCost
         });
-    },
-
-
-    /**
-     * When user hovers mouse over a county, change contents of popup.
-     * @param {event} e
-     */
-    mouseMove(e) {
-        var layer = e.target;
-
-        // highlight feature
-        layer.setStyle({
-            weight: 3,
-            opacity: 0.3,
-            fillOpacity: 0.9
-        });
-
-        if (!L.Browser.ie && !L.Browser.opera) {
-            layer.bringToFront();
-        }
     },
 
 
@@ -444,16 +420,6 @@ var MyMap = {
         if (!MyMap.countyPopup._map) MyMap.countyPopup.openOn(MyMap.map);
         window.clearTimeout(MyMap.closeTooltip);
 
-    },
-
-
-    /**
-     * When user moves mouse off of county, remove popup.
-     * @param {event} e
-     */
-    mouseOut(e) {
-        // resetStyle() is a mapbox func?
-        MyMap.projectCountPerCountyLayer.resetStyle(e.target);
     },
 
 
