@@ -146,7 +146,7 @@ var MyMap = {
         // Set up and show the project count per county layer
         this.projectCountPerCountyLayer = L.geoJson(MyMap.kenyaCounties, {
                                style: MyMap.getCountPerCountyStyle,
-                               onEachFeature: MyMap.onEachFeature
+                               onEachFeature: MyMap.onEachFeatureForCount
                            });
         this.projectCountPerCountyLayer.addTo(MyMap.map);
 
@@ -154,7 +154,7 @@ var MyMap = {
         // Set up the project cost per county layer
         this.projectCostPerCountyLayer = L.geoJson(MyMap.kenyaCounties, {
                                style: MyMap.getCostPerCountyStyle,
-                               onEachFeature: MyMap.onEachFeature
+                               onEachFeature: MyMap.onEachFeatureForCost
                            });
     },
 
@@ -165,9 +165,10 @@ var MyMap = {
     gatherInfoAboutCounties() {
         this.markerData.features.forEach(function(feature, i) {
 
-            // If the county property is null, skip
+            // If the county is unknown, skip it.
             if (feature.properties.county == null) return;
 
+            // Uppercase county names for consistency
             var county = feature.properties.county.toUpperCase();
 
             // Create the county property in the array if it doesn't exist
@@ -175,7 +176,9 @@ var MyMap = {
                 MyMap.countyDetails[county] = {
                     "project_count": 1,
                     "projects_missing_from_map": 0,
-                    "projects_total_cost": 0
+                    "projects_total_cost": 0,
+                    "average_cost_of_project": 0,
+                    "projects_with_annual_cost_data_missing": 0
                 };
             }
             // Else increment the tally for the county
@@ -192,6 +195,18 @@ var MyMap = {
             if (feature.properties.project_cost_yearly_breakdown__) {
                 // Store the total cost of all projects within the county
                 MyMap.countyDetails[county]["projects_total_cost"] += feature.properties.project_cost_yearly_breakdown__;
+
+                // Get the average cost of a project
+                // NOTE: To generate the average cost of a project, we need to use the number of projects
+                // for which we have data about the annual cost. That means we must subtract `projects_with_annual_cost_data_missing`
+                // from `project_count`
+                var total = MyMap.countyDetails[county]["project_count"] - MyMap.countyDetails[county]["projects_with_annual_cost_data_missing"];
+
+                MyMap.countyDetails[county]["average_cost_of_project"] = (MyMap.countyDetails[county]["projects_total_cost"] / total);
+            }
+            // Else increment the number of projects for which we have no data about the annual cost
+            else {
+                ++MyMap.countyDetails[county]["projects_with_annual_cost_data_missing"];
             }
         });
     },
@@ -235,36 +250,41 @@ var MyMap = {
         if (typeof(feature.properties.COUNTY) === "string") {
             var COUNTY = MyMap.countyDetails[feature.properties.COUNTY.toUpperCase()];
         }
-        var average_projects_cost = (COUNTY == null) ? null : COUNTY["projects_total_cost"] / COUNTY["project_count"];
-
-        // console.log(average_projects_cost);
+        // If county name isn't available, `average_cost_of_project` is also unknown
+        if (COUNTY == null) {
+            var average_cost_of_project = null;
+        }
+        // Else use the number generated earlier
+        else {
+            var average_cost_of_project = COUNTY["average_cost_of_project"];
+        }
 
         return {
             weight: 2,
             opacity: 0.1,
             color: 'black',
             fillOpacity: 0.7,
-            fillColor: MyMap.getCostPerCountyColor(average_projects_cost)
+            fillColor: MyMap.getCostPerCountyColor(average_cost_of_project)
         };
     },
 
 
     /**
      * Get color depending on population density value
-     * @param {number} average_projects_cost
+     * @param {number} average_cost_of_project
      */
-    getCostPerCountyColor(average_projects_cost) {
-        // `average_projects_cost` will be `null` if no projects are known to be in that county.
-        if (average_projects_cost != null) {
+    getCostPerCountyColor(average_cost_of_project) {
+        // `average_cost_of_project` will be `null` if no projects are known to be in that county.
+        if (average_cost_of_project != null) {
 
             // Various shades of orange.
-            return average_projects_cost > 1000000000000 ? '#8c2d04' :
-                average_projects_cost > 500000000000  ? '#cc4c02' :
-                average_projects_cost > 100000000000  ? '#ec7014' :
-                average_projects_cost > 50000000000  ? '#fe9929' :
-                average_projects_cost > 10000000000   ? '#fec44f' :
-                average_projects_cost > 1000000000   ? '#fee391' :
-                average_projects_cost > 100000000   ? '#fff7bc' :
+            return average_cost_of_project > 1000000000000 ? '#8c2d04' :
+                average_cost_of_project > 500000000000  ? '#cc4c02' :
+                average_cost_of_project > 100000000000  ? '#ec7014' :
+                average_cost_of_project > 50000000000  ? '#fe9929' :
+                average_cost_of_project > 10000000000   ? '#fec44f' :
+                average_cost_of_project > 1000000000   ? '#fee391' :
+                average_cost_of_project > 100000000   ? '#fff7bc' :
                 '#ffffe5';
         }
 
@@ -300,11 +320,21 @@ var MyMap = {
 
 
     // Set event callbacks
-    onEachFeature(feature, layer) {
+    onEachFeatureForCount(feature, layer, zoomType) {
         layer.on({
             mousemove: MyMap.mouseMove,
             mouseout: MyMap.mouseOut,
-            click: MyMap.zoomToFeature
+            click: MyMap.zoomToCountyForCount
+        });
+    },
+
+
+    // Set event callbacks
+    onEachFeatureForCost(feature, layer, zoomType) {
+        layer.on({
+            mousemove: MyMap.mouseMove,
+            mouseout: MyMap.mouseOut,
+            click: MyMap.zoomToCountyForCost
         });
     },
 
@@ -328,11 +358,12 @@ var MyMap = {
         }
     },
 
+
     /**
      * Show the popup for a county
      * @param {event} e
      */
-    showCountyPopup (e) {
+    showCountPopup (e) {
         // Must pass in an event (from onclick or mouseover)
         var layer = e.target;
 
@@ -345,12 +376,39 @@ var MyMap = {
         // Generate popup content
         var content = '<div class="marker-title">' + layer.feature.properties.COUNTY + '</div>';
         if (county_data !== undefined) {
-            content += '<div>' + county_data["number_of_projects"] + ' is number of projects. </div>';
+            content += '<div>' + county_data["project_count"] + ' is number of projects. </div>';
             content += '<div>' + county_data["projects_missing_from_map"] + ' is number of projects missing from map. </div>';
         }
-        // else {
-        //     content += '<div></div>';
-        // }
+
+        // Set popup content
+        MyMap.countyPopup.setContent(content);
+
+        // Open the popup
+        if (!MyMap.countyPopup._map) MyMap.countyPopup.openOn(MyMap.map);
+        window.clearTimeout(MyMap.closeTooltip);
+
+    },
+
+
+    /**
+     * Show the popup for a county
+     * @param {event} e
+     */
+    showCostPopup (e) {
+        // Must pass in an event (from onclick or mouseover)
+        var layer = e.target;
+
+        // Set position and content of the popup
+        MyMap.countyPopup.setLatLng(e.latlng);
+
+        // Get the project data for this county
+        var county_data = MyMap.countyDetails[layer.feature.properties.COUNTY.toUpperCase()];
+
+        // Generate popup content
+        var content = '<div class="marker-title">' + layer.feature.properties.COUNTY + '</div>';
+        if (county_data !== undefined) {
+            content += '<div>Average annual cost of projects in this county: ' + county_data["average_cost_of_project"] + '</div>';
+        }
 
         // Set popup content
         MyMap.countyPopup.setContent(content);
@@ -376,9 +434,19 @@ var MyMap = {
      * When user clicks on a county, zoom into it.
      * @param {event} e
      */
-    zoomToFeature(e) {
+    zoomToCountyForCount(e) {
         MyMap.map.fitBounds(e.target.getBounds());
-        MyMap.showCountyPopup(e);
+        MyMap.showCountPopup(e);
+    },
+
+
+    /**
+     * When user clicks on a county, zoom into it.
+     * @param {event} e
+     */
+    zoomToCountyForCost(e) {
+        MyMap.map.fitBounds(e.target.getBounds());
+        MyMap.showCostPopup(e);
     },
 
 
