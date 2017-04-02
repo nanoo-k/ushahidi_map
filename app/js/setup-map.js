@@ -1,26 +1,87 @@
 //
 // MARKERS
 ////////////
-L.mapbox.accessToken = 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw';
-var map = L.mapbox.map('map', 'mapbox.streets')
-    .setView([-0.143502, 38.031614], 6);
 
 var MyMap = {
-    data: data,
+    // Record instance of mapbox map
+    map: {},
+
+    // Access Token for mapbox
+    accessToken: 'pk.eyJ1IjoibmFub28tayIsImEiOiJjajB2N2NpN3AwMDA5MndwMXQ2NnQ2dTY2In0.xP3IuKEHtfzW_vmLNaajOw',
+
+    // Data for the markers
+    markerData: data,
+
+    // Mapxbox cluster markers
     markers: new L.MarkerClusterGroup(),
+
+    // Record info about projects within the county
     project_density_per_county: [],
 
+    // Instance of mapbox popup
+    countyPopup: new L.Popup({ autoPan: false }),
+
+    // Mapbox project count in state layer
+    projectCountPerStateLayer: {},
+
+    // Mapbox project cost per state layer
+    projectCostPerStateLayer: {},
+
+    // Layers data
+    kenyaCounties: kenya_counties,
+
     initialize() {
+        // Gather info about each county (like the number of projects in the county)
+        this.gatherInfoAboutCounties();
+
+        // Generates the basic map
+        this.setUpMap();
+
+        // Adds markers to the map
         this.addMarkers();
+
+        // Determines what happens when user drags map
+        MyMap.map.on('move', MyMap.onMove);
+        // call onmove off the bat so that the list is populated.
+        // otherwise, there will be no markers listed until the map is moved.
         this.onMove();
-        this.gatherInfoAboutCounty();
-        this.setUpChoropleth();
+
+        // Place the county layers, color them, and create the tooltips
+        this.createChoropleth();
+
+        // Create the legend
+        this.createLegend();
     },
 
+
+    /**
+     * Generates the basic map
+     *  i.e. Grabs the html element and places the mapbox map in it
+     */
+     setUpMap () {
+        L.mapbox.accessToken = MyMap.accessToken;
+        MyMap.map = L.mapbox.map('map', 'mapbox.streets')
+            .setView([-0.143502, 38.031614], 6);
+     },
+
+
+    /**
+     * Close the tooltip using a timeout
+     */
+    closeTooltip () {
+        window.setTimeout(function() {
+            MyMap.map.closePopup();
+        }, 100);
+    },
+
+
+    /**
+     * Add all the markers to the map
+     */
     addMarkers () {
-        for (var i = 0; i < this.data.features.length; i++) {
+        for (var i = 0; i < this.markerData.features.length; i++) {
             // The specific data we're working with is 'a'
-            var a = this.data.features[i];
+            var a = this.markerData.features[i];
             var props = a["properties"];
 
             if (props["x"] != null) {
@@ -47,35 +108,53 @@ var MyMap = {
 
         }
 
-        map.addLayer(this.markers);
+        MyMap.map.addLayer(this.markers);
     },
 
+
+    /**
+     * This method pulled from tutorial. What does it do?
+     */
     onMove() {
-        function onmove() {
-            // Get the map bounds - the top-left and bottom-right locations.
-            var inBounds = [],
-                bounds = map.getBounds();
-            MyMap.markers.eachLayer(function(marker) {
-                // For each marker, consider whether it is currently visible by comparing
-                // with the current map bounds.
-                if (bounds.contains(marker.getLatLng())) {
-                    inBounds.push(marker.options.title);
-                }
-            });
-            // Display a list of markers.
-            document.getElementById('coordinates').innerHTML = inBounds.join('\n');
-        }
+        // Get the map bounds - the top-left and bottom-right locations.
+        var inBounds = [],
+            bounds = MyMap.map.getBounds();
 
-        map.on('move', onmove);
-
-        // call onmove off the bat so that the list is populated.
-        // otherwise, there will be no markers listed until the map is moved.
-        onmove();
+        MyMap.markers.eachLayer(function(marker) {
+            // For each marker, consider whether it is currently visible by comparing
+            // with the current map bounds.
+            if (bounds.contains(marker.getLatLng())) {
+                inBounds.push(marker.options.title);
+            }
+        });
     },
 
-    gatherInfoAboutCounty() {
-        // CREATE project_density ARRAY
-        this.data.features.forEach(function(feature, i) {
+
+    /**
+     * Create the choropleth.
+     */
+    createChoropleth () {
+        // Set up and show the project count per state layer
+        this.projectCountPerStateLayer = L.geoJson(MyMap.kenyaCounties, {
+                               style: MyMap.getStyle,
+                               onEachFeature: MyMap.onEachFeature
+                           });
+        this.projectCountPerStateLayer.addTo(MyMap.map);
+
+
+        // Set up the project cost per state layer
+        this.projectCostPerStateLayer = L.geoJson(MyMap.kenyaCounties, {
+                               style: MyMap.getCostPerStateStyle,
+                               onEachFeature: MyMap.onEachFeature
+                           });
+    },
+
+
+    /**
+     * For each county, store the number of projects and the number of unlisted projects
+     */
+    gatherInfoAboutCounties() {
+        this.markerData.features.forEach(function(feature, i) {
 
             // If the county property is null, skip
             if (feature.properties.county == null) return;
