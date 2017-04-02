@@ -16,11 +16,13 @@ var MyMap = {
     clusteredMarkers: new L.MarkerClusterGroup(),
     individualMarkers: [],
 
+    // Collection for filtering only the "expensive" projects
     expensiveProjects: {
         clustered: new L.MarkerClusterGroup(),
         individual: []
     },
 
+    // Collection for filtering only the "inexpensive" projects
     inexpensiveProjects: {
         clustered: new L.MarkerClusterGroup(),
         individual: []
