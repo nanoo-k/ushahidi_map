@@ -13,7 +13,8 @@ var MyMap = {
     markerData: data,
 
     // Mapxbox cluster markers
-    markers: new L.MarkerClusterGroup(),
+    clusteredMarkers: new L.MarkerClusterGroup(),
+    individualMarkers: [],
 
     radioBtns: document.querySelectorAll('.county_filter'),
 
@@ -58,7 +59,10 @@ var MyMap = {
         // Create the legend
         this.createLegends();
 
-        // Set up the radio button blick handler
+        // Set up the checkbox click handler
+        this.toggleMarkerClusters();
+
+        // Set up the radio button click handler
         this.setupRadioButtonClickHandler();
     },
 
@@ -112,12 +116,13 @@ var MyMap = {
 
                 // Slap marker onto map
                 marker.bindPopup(popupContent);
-                this.markers.addLayer(marker);
+                this.clusteredMarkers.addLayer(marker);
+                this.individualMarkers.push(marker);
             }
 
         }
 
-        MyMap.map.addLayer(this.markers);
+        MyMap.map.addLayer(this.clusteredMarkers);
     },
 
 
@@ -129,7 +134,7 @@ var MyMap = {
         var inBounds = [],
             bounds = MyMap.map.getBounds();
 
-        MyMap.markers.eachLayer(function(marker) {
+        MyMap.clusteredMarkers.eachLayer(function(marker) {
             // For each marker, consider whether it is currently visible by comparing
             // with the current map bounds.
             if (bounds.contains(marker.getLatLng())) {
@@ -539,6 +544,35 @@ var MyMap = {
      */
     createLegends() {
         MyMap.map.legendControl.addLegend(MyMap.getProjectCountLegendHTML());
+    },
+
+
+    /**
+     * When user toggles the checkbox, switch between clustering markers
+     * and showing all markers individually.
+     */
+    toggleMarkerClusters () {
+        document.querySelector('#toggle_markers').addEventListener('change', function(e) {
+            // If user wants to see clustered markers, show those and hide the individual markers
+            if (e.target.checked) {
+
+                // Must remove each marker individually
+                MyMap.individualMarkers.forEach( function (marker, i) {
+                    MyMap.map.removeLayer(marker);
+                });
+
+                MyMap.map.addLayer(MyMap.clusteredMarkers);
+            }
+            // If user wants to see individual markers, show those and hide the clustered markers
+            else {
+                MyMap.map.removeLayer(MyMap.clusteredMarkers);
+
+                // Must hide each marker individually
+                MyMap.individualMarkers.forEach( function (marker, i) {
+                    MyMap.map.addLayer(marker);
+                });
+            }
+        });
     },
 
 
