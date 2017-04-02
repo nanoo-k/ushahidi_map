@@ -16,7 +16,15 @@ var MyMap = {
     clusteredMarkers: new L.MarkerClusterGroup(),
     individualMarkers: [],
 
-    radioBtns: document.querySelectorAll('.county_filter'),
+    expensiveProjects: {
+        clustered: new L.MarkerClusterGroup(),
+        individual: []
+    },
+
+    inexpensiveProjects: {
+        clustered: new L.MarkerClusterGroup(),
+        individual: []
+    },
 
     // Record info about projects within the county
     countyDetails: [],
@@ -63,7 +71,9 @@ var MyMap = {
         this.toggleMarkerClusters();
 
         // Set up the radio button click handler
-        this.setupRadioButtonClickHandler();
+        this.onSelectLayer();
+
+        this.onSelectPriceFilter();
     },
 
 
@@ -113,10 +123,23 @@ var MyMap = {
                 popupContent += `<p><b>Objective:</b> ${objectives}</p>`;
                 popupContent += `<p><b>Description:</b> ${description}</p>`;
 
-                // Slap marker onto map
+                // Bind the popoup content
                 marker.bindPopup(popupContent);
+
+                // Push marker into arrays destined for map
                 this.clusteredMarkers.addLayer(marker);
                 this.individualMarkers.push(marker);
+
+                // Dependig on how much this project costs annualy, save it as
+                // an expensive or inexpensive marker
+                if (props.project_cost_yearly_breakdown__ > 500000000) {
+                    this.expensiveProjects.clustered.addLayer(marker);
+                    this.expensiveProjects.individual.push(marker);
+                } else {
+                    this.inexpensiveProjects.clustered.addLayer(marker);
+                    this.inexpensiveProjects.individual.push(marker);
+                }
+
             }
 
         }
@@ -576,12 +599,12 @@ var MyMap = {
 
 
     /**
-     * Set up the click handler for the radio btns.
+     * Set up the click handler for the layer filter radio btns.
      * This switches between showing the average project cost per county
      * and the project count per county.
      */
-    setupRadioButtonClickHandler () {
-        MyMap.radioBtns.forEach( function (btn, i) {
+    onSelectLayer () {
+        document.querySelectorAll('.county_filter').forEach( function (btn, i) {
             btn.onclick = function(e) {
                 // Shut off project COST per county layer
                 // Turn on project COUNT per county layer
@@ -605,6 +628,38 @@ var MyMap = {
                     // Add layer and legend
                     MyMap.map.addLayer(MyMap.projectCostPerCountyLayer);
                     MyMap.map.legendControl.addLegend(MyMap.getProjectCostLegendHTML());
+                }
+            }
+        });
+    },
+
+
+    /**
+     * Set up the click handler for the price filter radio btns.
+     * This switches between showing all projects, showing expensive
+     * projects, and showing inexpensive projects.
+     */
+    onSelectPriceFilter () {
+        document.querySelectorAll('.price_filter').forEach( function (btn, i) {
+            btn.onclick = function(e) {
+
+                if (e.target.value === "all_projects") {
+                    // Show all markers
+                    MyMap.map.addLayer(MyMap.clusteredMarkers);
+                    MyMap.map.removeLayer(MyMap.expensiveProjects.clustered);
+                    MyMap.map.removeLayer(MyMap.inexpensiveProjects.clustered);
+                }
+                else if (e.target.value === "expensive_projects") {
+                    // Remove layer and legend
+                    MyMap.map.addLayer(MyMap.expensiveProjects.clustered);
+                    MyMap.map.removeLayer(MyMap.clusteredMarkers);
+                    MyMap.map.removeLayer(MyMap.inexpensiveProjects.clustered);
+                }
+                else if (e.target.value === "inexpensive_projects") {
+                    // Remove layer and legend
+                    MyMap.map.addLayer(MyMap.inexpensiveProjects.clustered);
+                    MyMap.map.removeLayer(MyMap.clusteredMarkers);
+                    MyMap.map.removeLayer(MyMap.expensiveProjects.clustered);
                 }
             }
         });
