@@ -23,11 +23,11 @@ var MyMap = {
     // Instance of mapbox popup
     countyPopup: new L.Popup({ autoPan: false }),
 
-    // Mapbox project count in state layer
-    projectCountPerStateLayer: {},
+    // Mapbox project count in county layer
+    projectCountPerCountyLayer: {},
 
-    // Mapbox project cost per state layer
-    projectCostPerStateLayer: {},
+    // Mapbox project cost per county layer
+    projectCostPerCountyLayer: {},
 
     // Layers data
     kenyaCounties: kenya_counties,
@@ -62,18 +62,18 @@ var MyMap = {
     setupRadioButtonClickHandler () {
         MyMap.radioBtns.forEach( function (btn, i) {
             btn.onclick = function(e) {
-                // Shut off project COST per state layer
-                // Turn on project COUNT per state layer
+                // Shut off project COST per county layer
+                // Turn on project COUNT per county layer
                 if (e.target.value === "project_cost") {
-                    MyMap.map.removeLayer(MyMap.projectCostPerStateLayer);
-                    MyMap.map.addLayer(MyMap.projectCountPerStateLayer);
+                    MyMap.map.removeLayer(MyMap.projectCostPerCountyLayer);
+                    MyMap.map.addLayer(MyMap.projectCountPerCountyLayer);
                 }
                 // Else user clicked the `project_count`
-                // Shut off project COUNT per state layer
-                // Turn on project COST per state layer
+                // Shut off project COUNT per county layer
+                // Turn on project COST per county layer
                 else {
-                    MyMap.map.removeLayer(MyMap.projectCountPerStateLayer);
-                    MyMap.map.addLayer(MyMap.projectCostPerStateLayer);
+                    MyMap.map.removeLayer(MyMap.projectCountPerCountyLayer);
+                    MyMap.map.addLayer(MyMap.projectCostPerCountyLayer);
                 }
             }
         });
@@ -160,17 +160,17 @@ var MyMap = {
      * Create the choropleth.
      */
     createChoropleth () {
-        // Set up and show the project count per state layer
-        this.projectCountPerStateLayer = L.geoJson(MyMap.kenyaCounties, {
-                               style: MyMap.getCountPerStateStyle,
+        // Set up and show the project count per county layer
+        this.projectCountPerCountyLayer = L.geoJson(MyMap.kenyaCounties, {
+                               style: MyMap.getCountPerCountyStyle,
                                onEachFeature: MyMap.onEachFeature
                            });
-        this.projectCountPerStateLayer.addTo(MyMap.map);
+        this.projectCountPerCountyLayer.addTo(MyMap.map);
 
 
-        // Set up the project cost per state layer
-        this.projectCostPerStateLayer = L.geoJson(MyMap.kenyaCounties, {
-                               style: MyMap.getCostPerStateStyle,
+        // Set up the project cost per county layer
+        this.projectCostPerCountyLayer = L.geoJson(MyMap.kenyaCounties, {
+                               style: MyMap.getCostPerCountyStyle,
                                onEachFeature: MyMap.onEachFeature
                            });
     },
@@ -215,11 +215,11 @@ var MyMap = {
 
 
     /**
-     * Define the style for each state
-     * `fillColor` determined by the density of projects in the state.
+     * Define the style for each county
+     * `fillColor` determined by the density of projects in the county.
      * @param {object} feature
      */
-    getCountPerStateStyle(feature) {
+    getCountPerCountyStyle(feature) {
 
         // Get the number of projects in this county.
         //      Some of the data arrives as something other than a string,
@@ -234,17 +234,17 @@ var MyMap = {
             opacity: 0.1,
             color: 'black',
             fillOpacity: 0.7,
-            fillColor: MyMap.getCountPerStateColor(number_of_projects)
+            fillColor: MyMap.getCountPerCountyColor(number_of_projects)
         };
     },
 
 
     /**
-     * Define the style for each state
-     * `fillColor` determined by the density of projects in the state.
+     * Define the style for each county
+     * `fillColor` determined by the density of projects in the county.
      * @param {object} feature
      */
-    getCostPerStateStyle(feature) {
+    getCostPerCountyStyle(feature) {
 
         // Get the number of projects in this county.
         //      Some of the data arrives as something other than a string,
@@ -261,7 +261,7 @@ var MyMap = {
             opacity: 0.1,
             color: 'black',
             fillOpacity: 0.7,
-            fillColor: MyMap.getCostPerStateColor(average_projects_cost)
+            fillColor: MyMap.getCostPerCountyColor(average_projects_cost)
         };
     },
 
@@ -270,7 +270,7 @@ var MyMap = {
      * Get color depending on population density value
      * @param {number} average_projects_cost
      */
-    getCostPerStateColor(average_projects_cost) {
+    getCostPerCountyColor(average_projects_cost) {
         // `average_projects_cost` will be `null` if no projects are known to be in that county.
         if (average_projects_cost != null) {
 
@@ -295,7 +295,7 @@ var MyMap = {
      * Get color depending on population density value
      * @param {number} number_of_projects
      */
-    getCountPerStateColor(number_of_projects) {
+    getCountPerCountyColor(number_of_projects) {
         // `number_of_projects` will be `null` if no projects are known to be in that county.
         if (number_of_projects != null) {
 
@@ -380,17 +380,17 @@ var MyMap = {
 
 
     /**
-     * When user moves mouse off of state, remove popup.
+     * When user moves mouse off of county, remove popup.
      * @param {event} e
      */
     mouseOut(e) {
         // resetStyle() is a mapbox func?
-        MyMap.projectCountPerStateLayer.resetStyle(e.target);
+        MyMap.projectCountPerCountyLayer.resetStyle(e.target);
     },
 
 
     /**
-     * When user clicks on a state, zoom into it.
+     * When user clicks on a county, zoom into it.
      * @param {event} e
      */
     zoomToFeature(e) {
@@ -415,12 +415,12 @@ var MyMap = {
             // A label defines what one of the colors means in terms of population density
             // Create label for undefined data (grey)
             if (grades[i] == undefined) {
-                var color = MyMap.getCountPerStateColor(null);
+                var color = MyMap.getCountPerCountyColor(null);
                 var text = "No data available";
             }
             // Create labels for every other color
             else {
-                var color = MyMap.getCountPerStateColor(from + 1);
+                var color = MyMap.getCountPerCountyColor(from + 1);
                 var text = from + (to ? '&ndash;' + to : '+');
             }
 
