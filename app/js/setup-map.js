@@ -543,25 +543,45 @@ var MyMap = {
      */
     toggleMarkerClusters () {
         document.querySelector('#toggle_markers').addEventListener('change', function(e) {
-            // If user wants to see clustered markers, show those and hide the individual markers
+            var all_projects = document.querySelector('#all_projects').checked;
+            var expensive_projects = document.querySelector('#expensive_projects').checked;
+            var inexpensive_projects = document.querySelector('#inexpensive_projects').checked;
+
+            // User wants to see clustered markers, so show those and hide the individual markers
             if (e.target.checked) {
 
+                if (all_projects) {
+                    // Add clustered markers group
+                    MyMap.map.addLayer(MyMap.clusteredMarkers);
+                }
+                else if (expensive_projects) {
+                    MyMap.map.addLayer(MyMap.expensiveProjects.clustered);
+                }
+                else if (inexpensive_projects) {
+                    MyMap.map.addLayer(MyMap.inexpensiveProjects.clustered);
+                }
+
                 // Must remove each marker individually
-                MyMap.individualMarkers.forEach( function (marker, i) {
-                    MyMap.map.removeLayer(marker);
-                });
-                // Add clustered markers group
-                MyMap.map.addLayer(MyMap.clusteredMarkers);
+                MyMap.removeCollection(MyMap.individualMarkers);
             }
+
             // If user wants to see individual markers, show those and hide the clustered markers
             else {
+                // Depending on which filter is selected, show all or some unclustered markers
+                if (all_projects) {
+                    MyMap.showCollection(MyMap.individualMarkers);
+                }
+                else if (expensive_projects) {
+                    MyMap.showCollection(MyMap.expensiveProjects.individual);
+                }
+                else if (inexpensive_projects) {
+                    MyMap.showCollection(MyMap.inexpensiveProjects.individual);
+                }
+
                 // Remove clustered markers group
                 MyMap.map.removeLayer(MyMap.clusteredMarkers);
-
-                // Must hide each marker individually
-                MyMap.individualMarkers.forEach( function (marker, i) {
-                    MyMap.map.addLayer(marker);
-                });
+                MyMap.map.removeLayer(MyMap.expensiveProjects.clustered);
+                MyMap.map.removeLayer(MyMap.inexpensiveProjects.clustered);
             }
         });
     },
@@ -612,25 +632,71 @@ var MyMap = {
         document.querySelectorAll('.price_filter').forEach( function (btn, i) {
             btn.onclick = function(e) {
 
+                // Show all projects
                 if (e.target.value === "all_projects") {
-                    // Show all markers
-                    MyMap.map.addLayer(MyMap.clusteredMarkers);
+                    // Show all markers (either as clusters or not)
+                    if (document.querySelector('#toggle_markers').checked) {
+                        MyMap.map.addLayer(MyMap.clusteredMarkers);
+                    } else {
+                        MyMap.showCollection(MyMap.individualMarkers);
+                    }
+
+                    // Hide all other layers of markers
                     MyMap.map.removeLayer(MyMap.expensiveProjects.clustered);
                     MyMap.map.removeLayer(MyMap.inexpensiveProjects.clustered);
+
                 }
+                // Show the expensive projects, hide all others
                 else if (e.target.value === "expensive_projects") {
-                    // Remove layer and legend
-                    MyMap.map.addLayer(MyMap.expensiveProjects.clustered);
+                    // Show expensive projects (either as clusters or not)
+                    if (document.querySelector('#toggle_markers').checked) {
+                        MyMap.map.addLayer(MyMap.expensiveProjects.clustered);
+                    } else {
+                        MyMap.showCollection(MyMap.expensiveProjects.individual);
+                    }
+
+                    // Hide all other layers of markers
                     MyMap.map.removeLayer(MyMap.clusteredMarkers);
                     MyMap.map.removeLayer(MyMap.inexpensiveProjects.clustered);
+
+                    MyMap.removeCollection(MyMap.inexpensiveProjects.individual);
                 }
+                // Show the inexpensive projects, hide all others
                 else if (e.target.value === "inexpensive_projects") {
-                    // Remove layer and legend
-                    MyMap.map.addLayer(MyMap.inexpensiveProjects.clustered);
+                    // Show inexpensive projects (either as clusters or not)
+                    if (document.querySelector('#toggle_markers').checked) {
+                        MyMap.map.addLayer(MyMap.inexpensiveProjects.clustered);
+                    } else {
+                        MyMap.showCollection(MyMap.inexpensiveProjects.individual);
+                    }
+
+                    // Hide all other layers of markers
                     MyMap.map.removeLayer(MyMap.clusteredMarkers);
                     MyMap.map.removeLayer(MyMap.expensiveProjects.clustered);
+
+                    MyMap.removeCollection(MyMap.expensiveProjects.individual);
                 }
             }
+        });
+    },
+
+    /**
+     * Shows layer of markers that are not clustered
+     * @param {array} collection
+     */
+    showCollection (collection) {
+        collection.forEach( function (marker, i) {
+            MyMap.map.addLayer(marker);
+        });
+    },
+
+    /**
+     * Hides layer of markers that are not clustered
+     * @param {array} collection
+     */
+    removeCollection (collection) {
+        collection.forEach( function (marker, i) {
+            MyMap.map.removeLayer(marker);
         });
     }
 
