@@ -582,11 +582,12 @@ var MyMap = {
                 MyMap.individualMarkers.forEach( function (marker, i) {
                     MyMap.map.removeLayer(marker);
                 });
-
+                // Add clustered markers group
                 MyMap.map.addLayer(MyMap.clusteredMarkers);
             }
             // If user wants to see individual markers, show those and hide the clustered markers
             else {
+                // Remove clustered markers group
                 MyMap.map.removeLayer(MyMap.clusteredMarkers);
 
                 // Must hide each marker individually
