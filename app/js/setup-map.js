@@ -105,7 +105,6 @@ var MyMap = {
 
                 // Create marker
                 var marker = L.marker(new L.LatLng(props["y"], props["x"]), {
-                    icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
                     title: title
                 });
 
