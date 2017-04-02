@@ -612,43 +612,7 @@ var MyMap = {
 
 };
 
-// Initialize the map
-MyMap.initialize();
-
-
-
-
-// var layers = document.getElementById('menu-ui');
-
-// // Add the layers of the map
-// addLayer(L.mapbox.tileLayer('mapbox.streets'), 'Base Map', 1);
-// addLayer(L.mapbox.tileLayer('examples.bike-lanes'), 'Bike Lanes', 2);
-// addLayer(L.mapbox.tileLayer('examples.bike-locations'), 'Bike Stations', 3);
-
-// function addLayer(layer, name, zIndex) {
-//     layer
-//         .setZIndex(zIndex)
-//         .addTo(MyMap.map);
-
-//     // Create a simple layer switcher that
-//     // toggles layers on and off.
-//     var link = document.createElement('a');
-//         link.href = '#';
-//         link.className = 'active';
-//         link.innerHTML = name;
-
-//     link.onclick = function(e) {
-//         e.preventDefault();
-//         e.stopPropagation();
-
-//         if (MyMap.map.hasLayer(layer)) {
-//             MyMap.map.removeLayer(layer);
-//             this.className = '';
-//         } else {
-//             MyMap.map.addLayer(layer);
-//             this.className = 'active';
-//         }
-//     };
-
-//     layers.appendChild(link);
-// }
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize the map
+    MyMap.initialize();
+});
