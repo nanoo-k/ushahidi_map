@@ -14,6 +14,7 @@ var MyMap = {
 
     // Mapxbox cluster markers
     clusteredMarkers: new L.MarkerClusterGroup(),
+    // "Individual" markers are unclustered markers
     individualMarkers: [],
 
     // Collection for filtering only the "expensive" projects
