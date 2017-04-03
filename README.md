@@ -75,6 +75,24 @@ I thought this would be a simple way to quickly add the final feature that lets 
 
 
 
+## BONUS: Optimizing data source
+For this project I loaded all the JSON from a script tag, but if I had stored this data on a database and retrieved it from a RESTful endpoint then we could have pulled just the information we needed.
+
+```
+"properties": {
+    "objectid": 1312,
+    "y": null,
+    "x": null,
+    "county": "SAMBURU",
+    "project_cost_yearly_breakdown__": 7000000,
+    "project_title": "Intergrated Enviromental Management Program In Daadab",
+    "project_description": "XYZ",
+    "project_objectives": "ABC",
+}
+```
+Those 8 lines of data (per marker) provided me with all the information I needed. The original dataset includes 27 lines. By writing specific SQL queries we could cut out 2/3 of the weight of the response package.
+
+
 ## BONUS: Novel ways to visualize the data
 
 ### Null coordinates
