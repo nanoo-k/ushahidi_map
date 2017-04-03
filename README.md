@@ -1,15 +1,15 @@
-# ushahidi_map
+# Map Challenge for Ushahidi
 
 ## Installation
 `git clone https://github.com/nanoo-k/ushahidi_map.git`
 
-No npm or bower scripts used. I pull mapbox in using what is hosted on mapbox.com [https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js].
+No npm or bower scripts used. I pull mapbox in using what is hosted on mapbox.com.[https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js].
 
 
 
 
 ## What the code does
-This code displays projects based in Kenya and provides a few methods for filtering both the markers and the county outlines. You can click on a county to see more data about it (the tooltip changes depending on which county overlay is being shown). You can also click on markers to see more details.
+This code displays projects based in Kenya and provides a few methods for filtering the markers and for swapping county overlays. You can click on a county to see more data about it (the tooltip changes depending on which county overlay is being shown). You can also click on markers to see more details.
 
 ### Toggling clusters
 You may view markers in both clustered and unclustered form. Use the checkbox labled "Cluster markers" to toggle this.
@@ -21,7 +21,7 @@ I provide two layers that provide a quick assessment of what's going on in each 
 In addition, you may toggle the markers, showing some and hiding others depeding on how you filter.
 - You may see all projects
 - See only the projects that cost more than $500,000,000
-- See the projects that cost less than $500,000,000.
+- See the projects that cost less than $500,000,000
 
 
 
@@ -36,10 +36,33 @@ Ultimately I decided to focus on learning about mapbox, and so I cut away any ta
 I chose to work with Mapbox instead of leaflet because I thought it provided more out-of-the-box features that I was going to implement (like marker clutering), but I realized that the mapbox used implemented the same plugins used by leaflet.
 
 ### Code structure
-Instead of starting by encapsulating my code in an object or some MVC structure, I started with the examples provided by mapbox. In those examples, the javascript is written right into the HTML, so I started with that. Using exampled provided by mapbox I was able to meet the first three requirements without code becoming too bloated. When adding the bonus features I decided to move all the javascript to its own file and encapsulate it, setting up a function dedicated to initializing the map (called `MyMap.initialize`). I also took this opportunity to study the examples in more detail and comment the code to explain to myself what it was doing.
+Instead of starting by encapsulating my code in an object or by using some MVC structure, I started with the examples provided by mapbox. In those examples, the javascript is written right into the HTML, so I followed suit. Using these examples I was able to meet the first three requirements without code becoming too bloated. When adding the bonus features I decided to move all the javascript to its own file and encapsulate it, setting up a function dedicated to initializing the map (called `MyMap.initialize`). I also took this opportunity to study the examples in more detail and comment the code to explain to myself what it was doing.
 
-My codebase was becoming bulky when I added the filter that shows the average cost of projects per county, but when I completed the methods that filter out markers depending on the cost of a project I knew it would become unmaintainable. For example the `toggleMarkerClusters`, `onFilterLayer` and `onFilterByCost` functions all check whether the user is clustering markers or filtering them. Going forward it would be unmaintainable to add more filters that need to know the state of every other filter. Ideally the filters would operate on the data without needing to manage the 6 datasets I've created. An MVC framework like Angular would have helped mitigate this problem.
+My codebase was becoming bulky when I added the filter that shows the average cost of projects per county, but when I completed the methods that filter out markers based on the cost of a project I knew it would become unmaintainable. For example the `toggleMarkerClusters`, `onFilterLayer` and `onFilterByCost` functions all check whether the user is clustering markers or filtering them. Going forward it would be unmaintainable to add more filters that need to know the state of every other filter. Ideally the filters would operate on the data without needing to manage the 6 datasets I've created. An MVC framework like Angular would have helped mitigate this problem.
 
+### Why 6 datasets?
+Late in the project I created collections that store markers based on how they get filtered. There's a collection of all the markers as clusters, one for all the markers unclustered, another for expensive projects and yet another for inexpesive projects. Going forward this would be unmaintainable. I don't mean to speak lowly of myself but it's my honest assessment of the code as it stands.
+
+```
+// Mapxbox cluster markers
+clusteredMarkers: new L.MarkerClusterGroup(),
+// "Individual" markers are unclustered markers
+individualMarkers: [],
+
+// Collection for filtering only the "expensive" projects
+expensiveProjects: {
+    clustered: new L.MarkerClusterGroup(),
+    individual: []
+}
+
+// Collection for filtering only the "inexpensive" projects
+inexpensiveProjects: {
+    clustered: new L.MarkerClusterGroup(),
+    individual: []
+}
+```
+
+I thought this would be a simple way to quickly add the final feature that lets users filter data by project cost. It works but we would have to change it when adding more filters.
 
 
 
