@@ -73,9 +73,9 @@ var MyMap = {
         this.toggleMarkerClusters();
 
         // Set up the radio button click handler
-        this.onSelectLayer();
+        this.onFilterLayer();
 
-        this.onSelectPriceFilter();
+        this.onFilterByCost();
     },
 
 
@@ -592,7 +592,7 @@ var MyMap = {
      * This switches between showing the average project cost per county
      * and the project count per county.
      */
-    onSelectLayer () {
+    onFilterLayer () {
         document.querySelectorAll('.county_filter').forEach( function (btn, i) {
             btn.onclick = function(e) {
                 // Shut off project COST per county layer
@@ -628,7 +628,7 @@ var MyMap = {
      * This switches between showing all projects, showing expensive
      * projects, and showing inexpensive projects.
      */
-    onSelectPriceFilter () {
+    onFilterByCost () {
         document.querySelectorAll('.price_filter').forEach( function (btn, i) {
             btn.onclick = function(e) {
 
