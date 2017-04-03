@@ -87,6 +87,6 @@ Some projects have been around longer than others. It is sometimes the case that
 - <1 hour looking at the available tools (i.e. leaflet and mapbox) and choosing ones
 - 3.5 hours creating a project that met the first 3 requirements
 - 1.5 hours encapsulating that code within an object
-- 2 hours shading areas based on average cost of project per county
+- 2 hours shading areas based on average cost of project per county (Reached the 7 hour mark here)
 - 2 hours adding a UI to filter between all projects, expensive projects, and inexpensive projects
 - 1 hour writing up the README
