@@ -24,18 +24,21 @@
     <div id='map'></div>
     <nav id='menu-ui' class='menu-ui'>
         <!-- Toggle clustered markers on and off -->
-        <input type="checkbox" name="toggle_markers" id="toggle_markers" class="toggle_markers" checked="checked" /><label for="toggle_markers"> Cluster markers</label><br />
-        <hr />
+        <input type="checkbox" name="toggle_markers" id="toggle_markers" class="toggle_markers" checked="checked" /><label for="toggle_markers"> Cluster markers</label><br /><br />
+        <hr /><br />
 
         <!-- Layer filter -->
+        <div>Toggle county layers:</div><br />
         <input type="radio" name="county_filter" value="project_count" id="project_count" class="county_filter" /><label for="project_count"> Average project cost per county</label><br />
-        <input type="radio" name="county_filter" value="project_cost" id="project_cost" class="county_filter" checked="checked" /><label for="project_cost"> Number of projects per county</label><br />
-        <hr />
+        <input type="radio" name="county_filter" value="project_cost" id="project_cost" class="county_filter" checked="checked" /><label for="project_cost"> Number of projects per county</label><br /><br />
+        <hr /><br />
 
         <!-- Price filter -->
+        <div>Filter markers by project cost:</div><br />
         <input type="radio" name="price_filter" value="all_projects" id="all_projects" class="price_filter" checked="checked" /><label for="all_projects"> Show all projects</label><br />
-        <input type="radio" name="price_filter" value="expensive_projects" id="expensive_projects" class="price_filter" /><label for="expensive_projects"> Show projects that cost more than $500,000,000 annually</label><br />
-        <input type="radio" name="price_filter" value="inexpensive_projects" id="inexpensive_projects" class="price_filter" /><label for="inexpensive_projects"> Show projects that cost less than $500,000,000 annually</label>
+        <input type="radio" name="price_filter" value="expensive_projects" id="expensive_projects" class="price_filter" /><label for="expensive_projects"> Projects that cost > $500,000,000 annually</label><br />
+        <input type="radio" name="price_filter" value="inexpensive_projects" id="inexpensive_projects" class="price_filter" /><label for="inexpensive_projects"> Projects that cost < $500,000,000 annually</label>
+        <br />
     </nav>
 
 
