@@ -5,6 +5,7 @@
 
 No npm or bower scripts used. I pull mapbox in using what is hosted on mapbox.com.[https://api.mapbox.com/mapbox.js/v3.0.1/mapbox.js].
 
+To view the map after I completed the original three coding requirements, checkout tag v1.0 (`git checkout v1.0`).
 
 
 
