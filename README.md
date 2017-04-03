@@ -45,9 +45,10 @@ Late in the project I created collections that store markers based on how they g
 
 ```
 // Mapxbox cluster markers
-clusteredMarkers: new L.MarkerClusterGroup(),
+clusteredMarkers: new L.MarkerClusterGroup()
+
 // "Individual" markers are unclustered markers
-individualMarkers: [],
+individualMarkers: []
 
 // Collection for filtering only the "expensive" projects
 expensiveProjects: {
@@ -67,17 +68,19 @@ I thought this would be a simple way to quickly add the final feature that lets 
 
 
 ## Credit
-Learning how to build a choropleth: https://www.mapbox.com/mapbox.js/example/v1.0.0/choropleth/
-Learning how to cluster: https://www.mapbox.com/mapbox.js/example/v1.0.0/markercluster-custom-marker-icons/
+- Learning how to build a choropleth: https://www.mapbox.com/mapbox.js/example/v1.0.0/choropleth/
+- Learning how to cluster: https://www.mapbox.com/mapbox.js/example/v1.0.0/markercluster-custom-marker-icons/
 
 
 
 
-## Novel ways to visualize the data
+## BONUS: Novel ways to visualize the data
 
 ### Null coordinates
-While checking my code, I noticed that some counties like Marsabit have 12 projects within them but 2 of those projects are missing from the map. Looking at this more carefully I found that some of the projects have `null` coordinates but are listed as existing within a specific county. (Example: feature with `objectid` of `1312`). I'm not sure whether we are simply missing data or if `null` coordinates imply that the project just doesn't have a home base. If the project just doesn't have a homebase then we could visualize these by placing differently colored marker at the center of each county to display those projects which have no specific location. (Image can be found within repository as `null-coordinates.jpg`).
+While checking my code, I noticed that some counties like Marsabit have 12 projects within them but 2 of those projects are missing from the map. Looking at this more carefully I found that some of the projects have `null` coordinates but are listed as existing within a specific county. (Example: feature with `objectid` of `1312`). I'm not sure whether we are simply missing data or if `null` coordinates imply that the project just doesn't have a home base. If the project just doesn't have a homebase then we could visualize these by placing differently colored marker at the center of each county to display those projects which have no specific location. (Explanatory image can be found within repository as `/supporting-images/null-coordinates.png`).
 
+### Visualizing project duration
+Some projects have been around longer than others. It is sometimes the case that older projects are more stable and reliable. One way to quickly display which projects are stable would be to add a transparency effect to the markers. Markers that are more transparent are younger, with solid markers representing stable, old projects. We could also adjust the size of the marker for an added effect. (Explanatory image can be found within repository as `/supporting-images/project-duration.png`).
 
 
 ## Time Estimate
